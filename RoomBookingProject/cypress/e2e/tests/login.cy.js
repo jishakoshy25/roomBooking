@@ -1,0 +1,43 @@
+describe('Login',()=>{
+    it('Successful Login',()=>{
+        cy.intercept('POST','/api/auth/login').as('performlogin')
+        cy.intercept('GET','api/room').as('getRooms')
+        cy.visit('https://automationintesting.online/admin')
+        cy.get('[id="username"]').type('admin')
+        cy.get('#password').type('password')
+        cy.get('#doLogin').click()
+         cy.wait('@performlogin').then(({response})=>{
+            expect(response.statusCode).to.eq(200)
+            cy.log(response.body)
+            expect(response.body).to.have.property('token')
+        })
+        cy.wait('@getRooms').then(({response})=>{
+            expect(response.statusCode).to.eq(200)
+            cy.log(response.body)
+            expect(response.body).to.have.property('rooms')
+            expect(response.body.rooms).to.have.length.greaterThan(0)
+            expect(response.body.rooms[0]).to.have.property('roomid')
+            expect(response.body.rooms[0]).to.have.property('roomName')
+            expect(response.body.rooms[0]).to.have.property('type')
+        })
+        cy.url().should('include','/rooms')
+        cy.contains('Restful Booker Platform Demo')
+    })
+    it('Login failure',()=>{
+        cy.intercept('POST','/api/auth/login').as('performlogin')
+        cy.visit('https://automationintesting.online/admin')
+        cy.get('[id="username"]').type('admin')
+        cy.get('#password').type('password123')
+        cy.get('#doLogin').click()
+         cy.wait('@performlogin').then(({response})=>{
+            expect(response.statusCode).to.eq(401)
+            cy.log(response.body)
+            expect(response.body).to.not.have.property('token')
+        })
+       
+        cy.url().should('include','/admin')
+        cy.get('.alert-danger').should('be.visible')
+        cy.get('.alert-danger').should('have.text','Invalid credentials')
+        cy.contains('Restful Booker Platform Demo')
+    })
+})
