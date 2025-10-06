@@ -10,5 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "cypress": "^15.3.0"
+  },
+  "devDependencies": {
+    "cypress-recurse": "^1.37.1"
   }
 }
