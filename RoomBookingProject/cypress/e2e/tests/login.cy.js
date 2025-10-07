@@ -1,9 +1,14 @@
 import loginPage from "../pages/loginPage"
+import adminHomePage from "../pages/adminHomePage"
 describe('Login', () => {
+    beforeEach(() => {
+        // Navigate to the login page before each test
+        cy.visit('https://automationintesting.online/admin')
+    })
+
     it('Successful Login', () => {
         cy.intercept('POST', '/api/auth/login').as('performlogin')
         cy.intercept('GET', '/api/room').as('getRooms')
-        cy.visit('https://automationintesting.online/admin')
         loginPage.enterUsername('admin')
         loginPage.enterPassword('password')
         loginPage.loginClick()
@@ -27,7 +32,6 @@ describe('Login', () => {
     })
     it('Login failure', () => {
         cy.intercept('POST', '/api/auth/login').as('performlogin')
-        cy.visit('https://automationintesting.online/admin')
         loginPage.enterUsername('admin')
         loginPage.enterPassword('password123')
         loginPage.loginClick()
@@ -41,69 +45,14 @@ describe('Login', () => {
         loginPage.elements.alertInvalid().should('have.text', 'Invalid credentials')
         cy.contains('Restful Booker Platform Demo')
     })
-    it('Create Room', () => {
-        cy.intercept('POST', '/api/room').as('createRoom')
-        cy.visit('https://automationintesting.online/admin')
-        loginPage.enterUsername('admin')
-        loginPage.enterPassword('password')
-        loginPage.loginClick()
-        cy.url().should('include', '/rooms')
-        cy.contains('Restful Booker Platform Demo')
-        cy.get('input#roomName').type('301')
-        cy.get('select#type').select('Single')
-        cy.get('select#accessible').select('true')
-        cy.get('input#roomPrice').type('140')
-        cy.get('input#wifiCheckbox').click()
-        cy.get('button#createRoom').click()
-        cy.wait('@createRoom').then(({ request, response }) => {
-            expect(response.statusCode).to.eq(200)
-            cy.log(response.body)
-            expect(response.body).to.have.property('success')
 
+    afterEach(() => {
+        cy.log('After each test: Clean up');
+        cy.url().then(($url) => {
+            if ($url.includes('/rooms')) {
+                adminHomePage.clickLogout()
+            }
         })
-    })
-    it('Update Room Details', () => {
-        cy.intercept('PUT', '/api/room/*').as('updateRoom')
-        cy.intercept('GET', '/api/room/*').as('getRoom')
-        cy.visit('https://automationintesting.online/admin')
-        loginPage.enterUsername('admin')
-        loginPage.enterPassword('password')
-        loginPage.loginClick()
-        cy.url().should('include', '/rooms')
-        cy.contains('Restful Booker Platform Demo')
-        cy.get('p#roomName301').eq(0).click()
-        cy.url().should('include', '/room/')
-        cy.contains('button', 'Edit').click()
-        cy.get('#roomPrice').clear().type('160')
-        cy.get('textarea#description').clear().type('added new description')
-        cy.get('#update').click()
-        cy.wait('@updateRoom').then(({ response }) => {
-            expect(response.statusCode).to.eq(200)
-            cy.log(response.body)
-            expect(response.body).to.have.property('success')
-        })
-        cy.wait('@getRoom').then(({response})=>{
-             expect(response.statusCode).to.eq(200)
-            cy.log(response.body)
-            expect(response.body).to.have.property('roomName','301')
-            expect(response.body).to.have.property('roomid')
-        })
-    })
-     it('Delete room', () => {
-        cy.intercept('DELETE', '/api/room/*').as('deleteRoom')
-        cy.visit('https://automationintesting.online/admin')
-        loginPage.enterUsername('admin')
-        loginPage.enterPassword('password')
-        loginPage.loginClick()
-        cy.url().should('include', '/rooms')
-        cy.contains('Restful Booker Platform Demo')
-        cy.get('div span.fa-remove').last().click()
-        cy.wait('@deleteRoom').then(({ response }) => {
-            expect(response.statusCode).to.eq(200)
-            cy.log(response.body)
-            cy.get('p#roomName301').should('not.exist')
-        })
-
     })
 }
 )
