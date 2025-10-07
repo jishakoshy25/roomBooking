@@ -10,7 +10,7 @@ class updateRoom {
     }
     enterDescription(description) {
         this.elements.description().clear()
-        this.elements.description().type('added new description')
+        this.elements.description().type(description)
     }
     clickUpdateBtn() {
         this.elements.updateBtn().click()
