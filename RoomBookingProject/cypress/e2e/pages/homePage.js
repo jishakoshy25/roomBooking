@@ -1,12 +1,14 @@
 import { recurse } from 'cypress-recurse';
 class homePage {
     elements = {
+        brandLink: ()=>cy.get('a.navbar-brand'),
+        navLinks: ()=> cy.get('ul.navbar-nav a.nav-link'),
         checkinDate: () => cy.get('div.react-datepicker__input-container>input.form-control').eq(0),
         checkoutDate: () => cy.get('div.react-datepicker__input-container>input.form-control').eq(1),
         checkAvailabilityBtn: () => cy.contains('button', 'Check Availability'),
+        bookNowBtn: () => cy.get('.btn[href*="reservation"]').eq(0)
     }
     enterCheckinDate(year, month, date) {
-
         this.elements.checkinDate().click()
         //this.elements.checkinDate().type(date)
         this.selectYear(year);
@@ -67,6 +69,16 @@ class homePage {
 
     clickCheckAvailability() {
         this.elements.checkAvailabilityBtn().click();
+    }
+
+    clickBookNowButton(){
+        this.elements.bookNowBtn().click()
+    }
+    clickLinks(linkIndex){
+        this.elements.navLinks().eq(linkIndex).click()
+    }
+    clickBrandLink(){
+        this.elements.brandLink().click()
     }
 }
 module.exports = new homePage()
