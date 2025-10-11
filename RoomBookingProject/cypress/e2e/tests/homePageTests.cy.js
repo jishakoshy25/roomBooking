@@ -28,8 +28,8 @@ describe('Check Room Availability', () => {
     })
     it('check navigation links', () => {
         const links = ['rooms', 'booking', 'amenities', 'location', 'contact', 'admin']
-        const section = ['section#rooms h2.display-5', 'section#rooms h2.display-5', 
-            'section#rooms h2.display-5', 'section#location h2.display-5','section#contact h3.h4']
+        const section = ['section#rooms h2.display-5', 'section#rooms h2.display-5',
+            'section#rooms h2.display-5', 'section#location h2.display-5', 'section#contact h3.h4']
         links.forEach((element, index) => {
             homePage.clickLinks(index)
             if (element == 'admin') {
@@ -40,7 +40,41 @@ describe('Check Room Availability', () => {
             }
         })
         homePage.clickBrandLink()
-        cy.url().should('equal','https://automationintesting.online/')
+        cy.url().should('equal', 'https://automationintesting.online/')
+    })
+    it('contact form: valid data', () => {
+        cy.intercept('POST', '/api/message').as('messageOwner')
+        homePage.enterNameField("jjosjo")
+        homePage.enterEmailField("jjosjo@gmail.com")
+        homePage.enterPhoneField("12222222222")
+        homePage.enterSubjectField("I need a room")
+        homePage.enterDescriptionField("I need a room on 29th")
+        homePage.clickSubmitButton()
+        cy.wait('@messageOwner').then((interception) => {
+            expect(interception.response.statusCode).eq(200)
+            cy.log(interception.response.body)
+            expect(interception.response.body).to.have.property('success', true)
+            cy.fixture('message.json').then((fixtureData) => {
+                expect(interception.request.body).to.deep.equal(fixtureData)
+            })
+
+        })
+    })
+    it('contact form: invalid input', () => {
+        cy.intercept('POST', '/api/message').as('messageOwner')
+        homePage.enterNameField("jjosjo")
+        homePage.enterEmailField("jjosjo@gmail.com")
+        homePage.enterPhoneField("12222222222")
+        homePage.enterSubjectField("aji")
+        homePage.enterDescriptionField("duagu")
+        homePage.clickSubmitButton()
+        cy.wait('@messageOwner').then((interception) => {
+            expect(interception.response.statusCode).eq(400)
+            cy.log(interception.response.body)
+            const possibleValues = ['Subject must be between 5 and 100 characters.', 'Message must be between 20 and 2000 characters.'];
+            expect(interception.response.body[0]).to.be.oneOf(possibleValues)
+            expect(interception.response.body[1]).to.be.oneOf(possibleValues)
+        })
     })
     afterEach(() => {
         //Runs after each test

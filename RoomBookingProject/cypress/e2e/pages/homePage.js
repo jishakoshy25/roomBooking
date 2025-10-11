@@ -1,16 +1,21 @@
 import { recurse } from 'cypress-recurse';
 class homePage {
     elements = {
-        brandLink: ()=>cy.get('a.navbar-brand'),
-        navLinks: ()=> cy.get('ul.navbar-nav a.nav-link'),
+        brandLink: () => cy.get('a.navbar-brand'),
+        navLinks: () => cy.get('ul.navbar-nav a.nav-link'),
         checkinDate: () => cy.get('div.react-datepicker__input-container>input.form-control').eq(0),
         checkoutDate: () => cy.get('div.react-datepicker__input-container>input.form-control').eq(1),
         checkAvailabilityBtn: () => cy.contains('button', 'Check Availability'),
-        bookNowBtn: () => cy.get('.btn[href*="reservation"]').eq(0)
+        bookNowBtn: () => cy.get('.btn[href*="reservation"]').eq(0),
+        nameInputField: () => cy.get('input#name'),
+        emailField: () => cy.get('input#email'),
+        phoneField: () => cy.get('input#phone'),
+        subjectField: () => cy.get('input#subject'),
+        descriptionField: () => cy.get('textarea#description'),
+        submitBtn: () => cy.contains('button', 'Submit')
     }
     enterCheckinDate(year, month, date) {
         this.elements.checkinDate().click()
-        //this.elements.checkinDate().type(date)
         this.selectYear(year);
         this.selectMonth(month);
         cy.get('.react-datepicker__header').click()
@@ -18,7 +23,6 @@ class homePage {
     }
     enterCheckoutDate(year, month, date) {
         this.elements.checkoutDate().click()
-        //this.elements.checkoutDate().type(date)
         this.selectYear(year);
         this.selectMonth(month);
         cy.get('.react-datepicker__header').click()
@@ -71,14 +75,37 @@ class homePage {
         this.elements.checkAvailabilityBtn().click();
     }
 
-    clickBookNowButton(){
+    clickBookNowButton() {
         this.elements.bookNowBtn().click()
     }
-    clickLinks(linkIndex){
+    clickLinks(linkIndex) {
         this.elements.navLinks().eq(linkIndex).click()
     }
-    clickBrandLink(){
+    clickBrandLink() {
         this.elements.brandLink().click()
+    }
+    enterNameField(name) {
+        this.elements.nameInputField().clear()
+        this.elements.nameInputField().type(name)
+    }
+    enterEmailField(email) {
+        this.elements.emailField().clear()
+        this.elements.emailField().type(email)
+    }
+    enterPhoneField(phone) {
+        this.elements.phoneField().clear()
+        this.elements.phoneField().type(phone)
+    }
+    enterSubjectField(subject) {
+        this.elements.subjectField().clear()
+        this.elements.subjectField().type(subject)
+    }
+    enterDescriptionField(description) {
+        this.elements.descriptionField().clear()
+        this.elements.descriptionField().type(description)
+    }
+    clickSubmitButton() {
+        this.elements.submitBtn().click()
     }
 }
 module.exports = new homePage()
