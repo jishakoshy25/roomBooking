@@ -12,7 +12,8 @@ class homePage {
         phoneField: () => cy.get('input#phone'),
         subjectField: () => cy.get('input#subject'),
         descriptionField: () => cy.get('textarea#description'),
-        submitBtn: () => cy.contains('button', 'Submit')
+        submitBtn: () => cy.contains('button', 'Submit'),
+        footerLinks: () => cy.get('footer a.text-white')
     }
     enterCheckinDate(year, month, date) {
         this.elements.checkinDate().click()
@@ -106,6 +107,9 @@ class homePage {
     }
     clickSubmitButton() {
         this.elements.submitBtn().click()
+    }
+    clickFooterLinks(linkIndex) {
+        this.elements.footerLinks().eq(linkIndex).click()
     }
 }
 module.exports = new homePage()

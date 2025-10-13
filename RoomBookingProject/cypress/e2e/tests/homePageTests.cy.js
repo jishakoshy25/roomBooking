@@ -76,6 +76,20 @@ describe('Check Room Availability', () => {
             expect(interception.response.body[1]).to.be.oneOf(possibleValues)
         })
     })
+    //test fails as the footer links are not set properly in this case
+    it('footer links',()=>{
+        const links = ['/','rooms', 'booking', 'contact']
+        const section = ['nav.navbar','section#rooms h2.display-5', 'section#rooms h2.display-5', 'section#contact h3.h4']
+        links.forEach((element, index) => {
+            homePage.clickFooterLinks(index)
+            if(element == '/'){
+                 cy.url().should('equal', 'https://automationintesting.online/#')}
+                else{
+                cy.url().should('equal', `https://automationintesting.online/#${element}`)
+                }
+            cy.get(`${section[index]}`).elementIsInView()         
+        })
+    })
     afterEach(() => {
         //Runs after each test
         cy.log('After each test: Check Room Availability ')
